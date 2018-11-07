@@ -5,20 +5,19 @@ import MainTabNavigator from './MainTabNavigator';
 import AuthLoadingScreen from '../screens/AuthLoadingScreen';
 import SignInScreen from '../screens/SignInScreen';
 import SignUpScreen from '../screens/SignUpScreen';
-import BasicToastScreen from '../screens/BasicToast';
 import ScanBarcodeScreen from '../screens/ScanBarcodeScreen';
 import TransactionScreen from '../screens/TransactionScreen';
 import SettingsScreen from '../screens/SettingsScreen';
 import AccountScreen from '../screens/AccountScreen';
-import ReqAssetScreen from '../screens/ReqAssetScreen';
 import HistoryScreen from '../screens/HistoryScreen';
+import DetailTransactionScreen from '../screens/DetailTransactionScreen';
 
 const AppStack = createStackNavigator({
 	 Account: AccountScreen, 
-	 Transaction: TransactionScreen,
-	 ReqAsset : ReqAssetScreen,
+	 Transaction: TransactionScreen,	 
 	 History : HistoryScreen,
-	 ScanBarcode : ScanBarcodeScreen
+	 ScanBarcode : ScanBarcodeScreen,
+	 DetailTransaction: DetailTransactionScreen
 });
 const AuthStack = createStackNavigator({ SignIn: SignInScreen , SignUp : SignUpScreen});
 export default createSwitchNavigator({

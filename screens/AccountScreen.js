@@ -7,6 +7,8 @@ import {
   StyleSheet,  
   TouchableOpacity,
   View,
+  Alert,
+  Clipboard
 } from 'react-native';
 import { connect } from 'react-redux';
 import {
@@ -24,6 +26,7 @@ import {
   Icon,
   ListItem,
   List,
+  Toast,
   Text} from 'native-base';
 
 import {  Font } from 'expo';
@@ -31,8 +34,9 @@ import PropTypes from 'prop-types';
 import { MonoText } from '../components/StyledText';
 import QRCode from 'react-native-qrcode';
 import TabBarIcon from '../components/TabBarIcon';
+import LocalEndpoint  from '../api/local/Endpoint';
 import { store } from '../App';
-
+import MainTabNavigator from '../navigation/MainTabNavigator';
 
 
 const robot = require('../assets/images/robot-prod.png');              
@@ -41,14 +45,55 @@ export class AccountScreen extends React.Component {
     header: null,
   };
   
-  async componentDidMount() {
-    console.log('state :',store.getState());
+  constructor(props) {        
+    super(props);    
+    this.state = {
+      balances: []
+    };    
+  }
+
+  async getBalances(public_key){                
+    return fetch(LocalEndpoint.balanceURL, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'public_key': public_key            
+          }
+        })
+        .then((response) => response.json())
+          .then(responseJson => {                      
+            if(responseJson.status =='OK'){              
+              this.setState({balances:responseJson.data})   
+            }else{
+              Toast.show({
+              text:'an error occured during loading balances!',
+              type:'danger',
+              buttonText:'Ok',              
+            })
+            }            
+          })
+          .catch(error => {
+            Toast.show({
+              text:'could not connect to server!',
+              type:'danger',
+              buttonText:'Ok',              
+            })            
+          });
+  }
+
+  async componentDidMount() {    
     try {
       var sessionJson = await AsyncStorage.getItem("@Wallet:session")
-      var session = await JSON.parse(sessionJson)
+      var session = await JSON.parse(sessionJson)      
+      this.getBalances(session.stellar_public_key)
       if (session !== null){        
-        this.props.dispatch({type:'SET_SESSION', session})
-      }
+        this.props.dispatch({type:'SET_SESSION', session})        
+        const didFocusSubscription = this.props.navigation.addListener(
+        'didFocus',
+        payload => {
+          this.getBalances(session.stellar_public_key)          
+      });
+      }    
     }
     catch(err) {
       this.props.dispatch({type:'RESET_STATE'})
@@ -67,34 +112,32 @@ export class AccountScreen extends React.Component {
           </Body>          
           <Right>
             <Button transparent onPress={this._signOutAsync}>
-              <Icon name='ios-exit' />
+              <Icon name={Platform.OS =='ios'? 'ios-power':'md-scanner'} />
             </Button>
           </Right>
         </Header>
         <View style={styles.container}>
         <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
           <View style={styles.welcomeContainer}>
-            <Image
-              source={require('../assets/images/stellar.png')}
-              style={styles.welcomeImage}
-            />
+            <Text style={styles.getStartedText}>Hello, {this.props.session.account_name}</Text>
+            <View  style={{height:10}}/>
             <QRCode
               value={this.props.session.stellar_public_key}
               size={200}
-              bgColor='purple'
+              bgColor='red'
               fgColor='white'/>
-          </View>
-          <View style={styles.getStartedContainer}>            
-            <Text style={styles.getStartedText}>Hello, {this.props.session.account_name}</Text>                        
-          </View>
+          </View>          
            <View style = {{height:10}} />
-           <View style={styles.getStartedContainer} accessible={true}>            
-            <Text style={styles.publicKeyText}> {this.props.session.stellar_public_key}</Text>                        
+           <View style={styles.getStartedContainer} >            
+            <Text style={styles.publicKeyText}>Your Public Key is: </Text>
+            <Text style={styles.publicKeyText} 
+            numberOfLines={2} 
+            selectable={true}>{this.props.session.stellar_public_key}</Text>                        
           </View>
           <View  style={{height:10}}/>
           <Content>
           <List
-            dataArray={this.props.session.stellar_acct_properties.balances}
+            dataArray={this.state.balances}
             renderRow={data =>
               <ListItem avatar>
                 <Left>
@@ -102,7 +145,7 @@ export class AccountScreen extends React.Component {
                 </Left>
                 <Body>
                   <Text>
-                    {data.asset_type}
+                    {(data.asset_type ==='native')?'Lumens': data.asset_type}
                   </Text>
                   <Text numberOfLines={1} note>
                     {data.balance}
@@ -123,8 +166,22 @@ export class AccountScreen extends React.Component {
   }
 
   _signOutAsync = async () => {
-    await AsyncStorage.clear();
-    this.props.navigation.navigate('Auth');
+    Alert.alert('Sign Out',
+      'Are you sure want to sign out?',
+      [{
+        text:'Yes', onPress :async()=>{
+          await AsyncStorage.clear();
+          this.props.navigation.navigate('Auth');
+          Toast.show({
+                text:'Signed out,Thank you!',
+                type:'success',
+                buttonText:'Ok',              
+          })
+        }
+      },
+      {
+        text:'No',style:'cancel'
+      }])    
   };
   
 
@@ -178,13 +235,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 4,
   },
   getStartedText: {
-    fontSize: 17,
+    fontSize: 20,
     color: 'rgba(96,100,109, 1)',
     lineHeight: 24,
     textAlign: 'center',
   },
   publicKeyText:{
-    fontSize: 10,
+    fontSize: 15,
     color: 'rgba(96,100,109, 1)',
     lineHeight: 24,
     textAlign: 'center',

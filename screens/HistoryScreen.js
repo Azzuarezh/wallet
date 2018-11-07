@@ -1,83 +1,226 @@
 import React from 'react';
 import {
+  AsyncStorage,
   Image,
   Platform,
   ScrollView,
-  StyleSheet,
-  Text,
+  StyleSheet,  
   TouchableOpacity,
   View,
 } from 'react-native';
+import {
+  Container, 
+  Header, 
+  Title, 
+  Content, 
+  Footer, 
+  FooterTab, 
+  Button, 
+  Left, 
+  Right, 
+  Body,
+  Thumbnail, 
+  Icon,
+  ListItem,
+  List,
+  Toast,
+  Text,
+  Spinner,
+  Segment
+} from 'native-base';
+import { connect } from 'react-redux';
 import { WebBrowser } from 'expo';
-
+import {  Font } from 'expo';
+import PropTypes from 'prop-types';
 import { MonoText } from '../components/StyledText';
+import QRCode from 'react-native-qrcode';
+import TabBarIcon from '../components/TabBarIcon';
+import LocalEndpoint  from '../api/local/Endpoint';
+import StellarEndpoint  from '../api/local/Endpoint';
+import { store } from '../App';
+import MainTabNavigator from '../navigation/MainTabNavigator';
+import moment from 'moment';
 
-export default class HistoryScreen extends React.Component {
+class HistoryScreen extends React.Component {
   static navigationOptions = {
     header: null,
   };
 
-  render() {
-    return (
-      <View style={styles.container}>
-        <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
-          <View style={styles.welcomeContainer}>
-            <Image
-              source={require('../assets/images/robot-prod.png')}
-              style={styles.welcomeImage}
-            />
-          </View>
-
-          <View style={styles.getStartedContainer}>
-            {this._maybeRenderDevelopmentModeWarning()}
-
-            <Text style={styles.getStartedText}>History Transaction</Text>
-            <Text style={styles.getStartedText}>
-              Change this text and your app will automatically reload.
-            </Text>
-          </View>
-
-          <View style={styles.helpContainer}>
-            <TouchableOpacity onPress={this._handleHelpPress} style={styles.helpLink}>
-              <Text style={styles.helpLinkText}>Help, it didn’t automatically reload!</Text>
-            </TouchableOpacity>
-          </View>
-        </ScrollView>
-      </View>
-    );
+  constructor(props) {        
+    super(props);    
+    this.state = {
+      historyTx: [],
+      isLoaded :false,
+      segment:'income',
+      public_key:''
+    };    
   }
 
-  _maybeRenderDevelopmentModeWarning() {
-    if (__DEV__) {
-      const learnMoreButton = (
-        <Text onPress={this._handleLearnMorePress} style={styles.helpLinkText}>
-          Learn more
-        </Text>
-      );
+  _goToDetailTx = (url) => {    
+    //WebBrowser.openBrowserAsync(url +'/operations');
+    this.props.navigation.navigate('DetailTransaction',url)
+  }
 
-      return (
-        <Text style={styles.developmentModeText}>
-          Development mode is enabled, your app will be slower but you can use useful development
-          tools. {learnMoreButton}
-        </Text>
-      );
-    } else {
-      return (
-        <Text style={styles.developmentModeText}>
-          You are not in development mode, your app will run at full speed.
-        </Text>
-      );
+  async getHistory(public_key){                
+    return fetch(LocalEndpoint.historyURL, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'public_key': public_key            
+          }
+        })
+        .then((response) => response.json())
+          .then(responseJson => {                      
+            if(responseJson.status =='OK'){              
+              this.setState({historyTx:responseJson.data})
+              this.setState({isLoaded:true})   
+            }else{
+              Toast.show({
+                text:'an error occured during loading history!',
+                type:'danger',
+                buttonText:'Ok',              
+              })
+              this.setState({isLoaded:true})   
+            }            
+          })
+          .catch(error => {
+            Toast.show({
+              text:'could not connect to server!',
+              type:'danger',
+              buttonText:'Ok',              
+            })
+            this.setState({isLoaded:true})               
+          });
+  }
+
+  formatDate (dtString) {    
+    formattedDate = moment(dtString).fromNow()    
+    return formattedDate
+  }
+
+   async componentDidMount() {    
+    try {
+      var sessionJson = await AsyncStorage.getItem("@Wallet:session")
+      var session = await JSON.parse(sessionJson)      
+      this.getHistory(session.stellar_public_key)
+      if (session !== null){        
+        this.props.dispatch({type:'SET_SESSION', session})        
+        this.setState({ public_key: session.stellar_public_key})
+        const didFocusSubscription = this.props.navigation.addListener(
+        'didFocus',
+        payload => {          
+          this.getHistory(session.stellar_public_key)          
+      });
+      }    
+    }
+    catch(err) {
+      this.props.dispatch({type:'RESET_STATE'})      
+      console.error(err);
     }
   }
 
-  _handleLearnMorePress = () => {
-    WebBrowser.openBrowserAsync('https://docs.expo.io/versions/latest/guides/development-mode');
-  };
+  getTxLength(tx){
+    return tx.filter(tx.display)
+  }
 
-  _handleHelpPress = () => {
-    WebBrowser.openBrowserAsync(
-      'https://docs.expo.io/versions/latest/guides/up-and-running.html#can-t-see-your-changes'
-    );
+  rendertransactionHistory(segment){        
+    var historyTx = this.state.historyTx
+    var incomeTx =[];
+    var outgoTx =[];    
+    var pk = this.state.public_key    
+    for(var i = historyTx.length -1; i >= 0 ; i--){
+        if(segment =='income'){          
+          if(historyTx[i].to === pk){            
+            incomeTx.push(historyTx[i])
+          }  
+        }else{          
+          if(historyTx[i].from === pk){            
+            outgoTx.push(historyTx[i])
+          }
+        }        
+    }    
+    if(this.state.isLoaded){
+      segmentTx = (segment === 'income') ? incomeTx : outgoTx;
+      if(segmentTx.length ===0){
+        return <Text style={styles.getStartedText}>No Transaction</Text>
+      }else{
+        return(
+        <List
+            dataArray={segmentTx}
+            renderRow={data =>
+              <ListItem avatar onPress={() => {                
+                this._goToDetailTx(data._links.transaction.href) 
+              }}>
+                <Left>
+                  <Thumbnail small source={require('../assets/images/stellar.png')} />
+                </Left>
+                <Body>                  
+                  <Text style={styles.linkText}>                  
+                    {data.amount} 
+                  </Text>
+                  <Text>                  
+                    {(data.asset_type==='native')?'Lumens':data.asset_type} - {data.type}
+                  </Text>
+                  <Text>{(segment === 'income') ? 'From : ' : 'To :'} </Text>
+                  <Text numberOfLines={4} note>                                        
+                    {(segment === 'income') ? data.from : data.to}
+                  </Text>
+                </Body>
+                <Right>                  
+                  <Text note>                   
+                  {this.formatDate(data.created_at)}
+                  </Text>
+                </Right>
+              </ListItem>
+            }
+          />)  
+      }      
+    }else{
+      return(<Spinner color='red' /> )
+    }
+  }
+
+  render() {
+    return (
+      <Container>
+        <Header hasSegment>          
+          <Body>
+            <Title>History</Title>
+          </Body>                    
+        </Header>
+        <Segment>
+          <Button active={this.state.segment === 'income' ? true : false} 
+          first 
+          onPress={() => this.setState({ segment: 'income' })}>
+            <Text>Incoming</Text>
+          </Button>
+          <Button active={this.state.segment === 'outgo' ? true : false}
+          last
+          onPress={() => this.setState({ segment: 'outgo' })}>
+            <Text>Outgoing</Text>
+          </Button>          
+        </Segment>
+        <View style={styles.container}>        
+          <View  style={styles.welcomeContainer}>
+            <Image
+              source={require('../assets/images/stellar.png')}
+              style={styles.welcomeImage}
+            />
+          </View>
+        <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>          
+          <Content>          
+            {this.rendertransactionHistory(this.state.segment)}
+          </Content>
+        </ScrollView>    
+      </View>            
+      </Container>
+      );
+  }  
+}
+
+function mapStateToProps(state) {
+  return {
+    session: state.session    
   };
 }
 
@@ -85,13 +228,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
-  },
-  developmentModeText: {
-    marginBottom: 20,
-    color: 'rgba(0,0,0,0.4)',
-    fontSize: 14,
-    lineHeight: 19,
-    textAlign: 'center',
   },
   contentContainer: {
     paddingTop: 30,
@@ -129,6 +265,12 @@ const styles = StyleSheet.create({
     lineHeight: 24,
     textAlign: 'center',
   },
+  publicKeyText:{
+    fontSize: 10,
+    color: 'rgba(96,100,109, 1)',
+    lineHeight: 24,
+    textAlign: 'center',
+  },
   tabBarInfoContainer: {
     position: 'absolute',
     bottom: 0,
@@ -156,16 +298,10 @@ const styles = StyleSheet.create({
   },
   navigationFilename: {
     marginTop: 5,
-  },
-  helpContainer: {
-    marginTop: 15,
-    alignItems: 'center',
-  },
-  helpLink: {
-    paddingVertical: 15,
-  },
-  helpLinkText: {
-    fontSize: 14,
+  },  
+  linkText: {    
     color: '#2e78b7',
   },
 });
+
+export default connect(mapStateToProps)(HistoryScreen);

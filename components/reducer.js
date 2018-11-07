@@ -13,9 +13,9 @@ export default function (state = initialState, action) {
       return {
         ...initialState
       }
-    case 'SET_PUBLIC_KEY':
+    case 'SET_PUBLIC_KEY':      
       return{
-        ...state, public_key:action.public_key
+        ...state, public_key: action.public_key
       }
     case 'RESET_PUBLIC_KEY':
       return{

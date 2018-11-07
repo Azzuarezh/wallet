@@ -19,10 +19,12 @@
     "expo": "^30.0.1",
     "express": "^4.16.3",
     "fs": "0.0.1-security",
+    "moment": "^2.22.2",
     "mongodb": "^3.1.7",
     "native-base": "^2.3.9",
     "prop-types": "^15.6.0",
     "react": "16.3.1",
+    "react-moment": "^0.8.2",
     "react-native": "https://github.com/expo/react-native/archive/sdk-30.0.0.tar.gz",
     "react-native-camera": "git+https://git@github.com/react-native-community/react-native-camera",
     "react-native-qrcode": "^0.2.7",
@@ -30,8 +32,7 @@
     "react-navigation": "^2.16.0",
     "react-redux": "^5.0.7",
     "redux": "^3.7.2",
-    "request-promise": "^4.2.2",
-    "stellar-sdk": "^0.11.0"
+    "request-promise": "^4.2.2"
   },
   "devDependencies": {
     "jest-expo": "30.0.0"

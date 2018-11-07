@@ -23,6 +23,10 @@ import {  Font } from 'expo';
 
 class SignInScreen extends React.Component {
 
+  static navigationOptions = {
+    header: null,
+  };
+
   constructor(props){
     super(props);
     this.state = {
@@ -44,8 +48,9 @@ class SignInScreen extends React.Component {
   }
 
   login = async(data) => {
-    console.log('url : ',LocalEndpoint.getAccountURL)    
-    fetch(LocalEndpoint.getAccountURL, {
+    console.log('url : ',LocalEndpoint.loginURL)
+    this.setState({loading:true})    
+    fetch(LocalEndpoint.loginURL, {
           method: 'POST',
           headers: {
             'Accept': 'application/json',
@@ -54,40 +59,38 @@ class SignInScreen extends React.Component {
           body: JSON.stringify(data)
         })
         .then((response) => response.json())
-          .then(responseJson => {            
-            console.log('responseJson : ', responseJson)
-            if(responseJson.status =='OK'){
-              Alert.alert("Welcome " + responseJson.data.account_name )
-              var session = responseJson.data;
-              storeSession(session)           
-              this.props.dispatch({type:'SET_SESSION', session});
-              this.props.navigation.navigate('Main');              
-            }else{
-              Alert.alert("Login Failed", responseJson.data);              
-            }
-            this.state.loading = false;
+        .then(responseJson => {                        
+          if(responseJson.status =='OK'){
+            Alert.alert("Welcome " + responseJson.data.account_name )
+            var session = responseJson.data;
+            storeSession(session)           
+            this.props.dispatch({type:'SET_SESSION', session});
+            this.props.navigation.navigate('Main');              
+          }else{
+            Alert.alert("Login Failed", responseJson.data);              
+          }
+          this.setState({loading:false})
+        })
+        .catch(error => {
+          Toast.show({
+            text:'can\'t connect to server!',
+            type:'danger',
+            buttonText:'Ok',              
           })
-          .catch(error => {
-            Toast.show({
-              text:'an error occured!',
-              type:'danger',
-              buttonText:'Ok',              
-            })
-            this.state.loading = false;
-            console.log('error',error)
-          });
+          this.setState({loading:false})
+          console.log('error',error)
+        });
   }
 
-  handleLoginPressed = async () => {
-    this.state.loading = true          
+  handleLoginPressed = async () => {            
     if(this.checkRequired(this.state.usernameTextBox,this.state.passwordTextbox)){
       let data = {
-        'account_name':this.state.usernameTextBox,
+        'username':this.state.usernameTextBox,
         'password': this.state.passwordTextBox
       }      
       this.login(data)
     }else{
-      Alert.alert("Sorry","fill the required fields")
+      Alert.alert("Sorry, Input Required!","Fill the required fields")
       this.state.loading = false;
     }    
   }
@@ -116,7 +119,7 @@ class SignInScreen extends React.Component {
         <Container>
           <Header />
           <Content>
-            <Spinner />
+            <Spinner color='red'/>
           </Content>
         </Container>
       );

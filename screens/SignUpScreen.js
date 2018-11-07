@@ -10,7 +10,8 @@ import { Container,
   Text, 
   Form, 
   Item, 
-  Label, 
+  Label,
+  Icon, 
   Input, 
   Right,
   Toast, 
@@ -21,25 +22,35 @@ import LocalEndpoint  from '../api/local/Endpoint';
 import {  Font } from 'expo';
 
 class SignUpScreen extends React.Component {
+  static navigationOptions = {
+    header: null,
+  };
 
   constructor(props){
     super(props);
     this.state = {
       showToast: false,
+      loading: false,
 	  	usernameTextBox : '',
-	  	passwordTextBox : ''
+	  	passwordTextBox : '',
+      accountNameTextBox:'',
 	  }
   }
 
   save = async(data) => {
     console.log('data :',data)          
-    if(this.state.usernameTextBox === '' || this.state.passwordTextbox ===''){
+    this.setState({loading:true});
+    if(this.state.usernameTextBox === '' 
+      || this.state.passwordTextbox ==='' 
+      || this.state.accountNameTextBox ===''){
       Toast.show({
           text:'Please fill the empty fields',
           type:'danger',
           buttonText:'Ok'          
         })
+    this.setState({loading:false})
     }else{
+      console.log('local endpoint : ',LocalEndpoint.createAccountURL)
       fetch(LocalEndpoint.createAccountURL, {
           method: 'POST',
           headers: {
@@ -59,6 +70,7 @@ class SignUpScreen extends React.Component {
             var session = responseJson;
             storeSession(session)           
             this.props.dispatch({type:'SET_SESSION', session});
+            this.setState({loading:false})
             this.props.navigation.navigate('Main');                     
           })
           .catch(error => {
@@ -68,6 +80,7 @@ class SignUpScreen extends React.Component {
               buttonText:'Ok',              
             })
             console.log('error',error)
+            this.setState({loading:false})
           }
           );    
     }    
@@ -83,7 +96,8 @@ class SignUpScreen extends React.Component {
   
   handleSignupPressed = () => {          
       let data = {
-        'account_name':this.state.usernameTextBox,
+        'account_name':this.state.accountNameTextBox,
+        'username':this.state.usernameTextBox,
         'password': this.state.passwordTextBox
       }
       this.save(data)      
@@ -94,6 +108,13 @@ class SignUpScreen extends React.Component {
   		...this.state,
   		usernameTextBox: usernameTextBox
   	})
+  }
+
+  handleAccountNameChange = (accountNameTextBox) => {
+    this.setState({
+      ...this.state,
+      accountNameTextBox : accountNameTextBox
+    })
   }
 
   handlePasswordChange = (passwordTextBox) => {
@@ -107,9 +128,19 @@ class SignUpScreen extends React.Component {
     if (this.state.loading === true){
       return (
         <Container>
-          <Header />
+          <Header>
+            <Left>
+                <Button transparent onPress={() => {this.props.navigation.goBack()}}>
+                  <Icon name="arrow-back" />
+                </Button>
+              </Left>          
+              <Body>
+                <Title>Sign Up</Title>
+              </Body>
+              <Right />          
+            </Header>
           <Content>
-            <Spinner />
+            <Spinner color='red' />
           </Content>
         </Container>
       );
@@ -117,14 +148,22 @@ class SignUpScreen extends React.Component {
       return(
         <Container>
           <Header>
-            <Left />
-            <Body>
-              <Title>Sign Up</Title>
-            </Body>
-            <Right />
-          </Header>
+            <Left>
+                <Button transparent onPress={() => {this.props.navigation.goBack()}}>
+                  <Icon name="arrow-back" />
+                </Button>
+              </Left>          
+              <Body>
+                <Title>Sign Up</Title>
+              </Body>
+              <Right />          
+            </Header>
           <Content padder contentContainerStyle={{justifyContent:'center', margin: 20}}>
             <Form>
+              <Item floatingLabel>
+                <Label>Account Name</Label>
+                <Input value={this.state.accountNameTextBox} onChangeText={this.handleAccountNameChange}/>
+              </Item>
               <Item floatingLabel>
                 <Label>Username</Label>
                 <Input value={this.state.usernameTextBox} onChangeText={this.handleUsernameChange}/>

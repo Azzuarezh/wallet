@@ -44,12 +44,11 @@ export class ScanBarcodeScreen extends React.Component {
       public_key : '',
       hasCameraPermission : null,
       type : Camera.Constants.Type.back,
-    };    
+    };      
   }
-
+  
   async componentDidMount() {
-      const { status } = await Permissions.askAsync(Permissions.CAMERA);
-      console.log('camera permission status :',status);
+      const { status } = await Permissions.askAsync(Permissions.CAMERA);      
       this.setState({ hasCameraPermission: status === 'granted' });      
       try {        
         var sessionJson = await AsyncStorage.getItem("@Wallet:session")
@@ -64,22 +63,25 @@ export class ScanBarcodeScreen extends React.Component {
         console.error(err);
       }
     }
+    
 
-    _handleBarCodeRead = ({ type, data }) => {          
-      store.dispatch({type:'SET_PUBLIC_KEY',data})
-      this.props.navigation.navigate('Transaction')            
+    _handleBarCodeRead = ({ type, data }) => {
+      var pk = {data}.data      
+      this.props.navigation.navigate('Transaction',{
+          public_key : pk
+      })            
     }
 
 
     renderCameraComponent = (permission)  =>{
       if(permission === null){
-        return <Text>permission is null</Text>;;
+        return <Text style={styles.getStartedText}>No Access to camera. Please Allow acces for this aplication to scan barcode</Text>;
       }else if(permission === false){
-        return <Text>No access to camera</Text>;
+        return <Text style={styles.getStartedText}>No Access to camera. Please Allow acces for this aplication to scan barcode</Text>;
       }else{
         return(
         <View style={{ flex: 1 , height: 300}}>
-          <Text>derorw</Text>
+          <Text>Scan</Text>
           <BarCodeScanner
             onBarCodeRead={this._handleBarCodeRead}
             style={StyleSheet.absoluteFill}
@@ -87,9 +89,7 @@ export class ScanBarcodeScreen extends React.Component {
         </View>
         )
       }
-    }
-
-    
+    }  
   
   render() {
     return (

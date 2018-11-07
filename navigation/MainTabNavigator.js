@@ -3,27 +3,20 @@ import { Platform } from 'react-native';
 import { createStackNavigator, createBottomTabNavigator } from 'react-navigation';
 
 import TabBarIcon from '../components/TabBarIcon';
-import SettingsScreen from '../screens/SettingsScreen';
+
+//stack account
 import AccountScreen from '../screens/AccountScreen';
+
+//stack transaction
 import TransactionScreen from '../screens/TransactionScreen';
-import ReqAssetScreen from '../screens/ReqAssetScreen';
-import HistoryScreen from '../screens/HistoryScreen';
 import ScanBarcodeScreen from '../screens/ScanBarcodeScreen';
 
+//stack history
+import HistoryScreen from '../screens/HistoryScreen';
+import DetailTransactionScreen from '../screens/DetailTransactionScreen';
 
-const SettingsStack = createStackNavigator({
-  Settings: SettingsScreen,
-});
 
-SettingsStack.navigationOptions = {
-  tabBarLabel: 'Settings',
-  tabBarIcon: ({ focused }) => (
-    <TabBarIcon
-      focused={focused}
-      name={Platform.OS === 'ios' ? `ios-options${focused ? '' : '-outline'}` : 'md-options'}
-    />
-  ),
-};
+
 
 
 const AccountStack = createStackNavigator({
@@ -31,7 +24,7 @@ const AccountStack = createStackNavigator({
 });
 
 AccountStack.navigationOptions = {
-  tabBarLabel: 'Akun',
+  tabBarLabel: 'Account',
   tabBarIcon: ({ focused }) => (
     <TabBarIcon
       focused={focused}
@@ -47,7 +40,7 @@ const TransactionStack = createStackNavigator({
 });
 
 TransactionStack.navigationOptions = {
-  tabBarLabel: 'Transaksi',
+  tabBarLabel: 'Transaction',
   tabBarIcon: ({ focused }) => (
     <TabBarIcon
       focused={focused}
@@ -56,26 +49,15 @@ TransactionStack.navigationOptions = {
   ),
 };
 
-const ReqAssetStack = createStackNavigator({
-  ReqAsset: ReqAssetScreen,
-});
 
-ReqAssetStack.navigationOptions = {
-  tabBarLabel: 'Req Asset',
-  tabBarIcon: ({ focused }) => (
-    <TabBarIcon
-      focused={focused}
-      name={  Platform.OS === 'ios' ? `ios-download${focused ? '' : '-outline'}` : 'md-download'}
-    />
-  ),
-};
 
 const HistoryStack = createStackNavigator({
-  History: HistoryScreen,
+  History: {screen: HistoryScreen},
+  DetailTransaction: {screen: DetailTransactionScreen},
 });
 
 HistoryStack.navigationOptions = {
-  tabBarLabel: 'History Tx',
+  tabBarLabel: 'History',
   tabBarIcon: ({ focused }) => (
     <TabBarIcon
       focused={focused}
@@ -91,6 +73,5 @@ const ScanBarcodeStack = createStackNavigator({
 export default createBottomTabNavigator({  
   AccountStack,
   TransactionStack,  
-  HistoryStack,
-  SettingsStack  
+  HistoryStack  
 });
