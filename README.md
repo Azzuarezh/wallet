@@ -95,7 +95,7 @@ you will be directed to the expo application. Allow expo to access the device in
 Make sure you are in the same network because the script injected from expo server to expo client.
 
 
-## Build App the app (Android)
+## Build the App (Android)
 For detail how to build Standalone mobile apps, you can refer to this [link](https://docs.expo.io/versions/latest/guides/building-standalone-apps.html).
 but if you want to know how to build the app, you can use the following code snippet:
 ```sh
