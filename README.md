@@ -85,7 +85,7 @@ $ npm install
 ```
 
 ## Run Application
-In order to run the app with development mode, you need to run the development server (Expo Server) 
+To run the app with development mode, you need to run the development server (Expo Server) 
 When dependencies installation done, execute the expo command to run the development server:
 ```sh
 $ expo start
