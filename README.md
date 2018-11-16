@@ -14,7 +14,7 @@ called [Expo](https://expo.io) and make sure development server (expo server) ru
 # Prerequisites
 - [Node and NPM](https://nodejs.org/)
 - [React-Native](https://facebook.github.io/react-native/)
-- Expo client on the device for development ([Ios](https://itunes.apple.com/us/app/expo-client/id982107779?mt=8)/[Android](https://play.google.com/store/apps/details?id=host.exp.exponent&hl=en))
+- Expo client on the device for development ([IOS](https://itunes.apple.com/us/app/expo-client/id982107779?mt=8)/[Android](https://play.google.com/store/apps/details?id=host.exp.exponent&hl=en))
 
 # Dependencies
 - [React-Native Camera](https://github.com/react-native-community/react-native-camera)
