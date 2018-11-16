@@ -1,4 +1,4 @@
-# wallet
+# Wallet
 Mobile application building wallet with stellar.
 
 
@@ -9,6 +9,13 @@ see history of transaction
 #### This Prototype using React-Native
 that can run under IOS and Android Platform, Due Apple Policy, to run on IOS device, you must install third party apps
 called [Expo](https://expo.io) and make sure development server running (expo server) and in same network between server and device
+
+# Getting Started
+## prerequisites
+ -Node and NPM
+ -React-Native
+ -Expo
+
 
 ## Build App the app (Android)
 For detail how to build Standalone mobile apps, you can refer to this [link](https://docs.expo.io/versions/latest/guides/building-standalone-apps.html).
