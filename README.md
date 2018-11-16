@@ -3,7 +3,7 @@ Mobile application building wallet with stellar.
 
 
 #### This Prototype describe basic processes on stellar blockchain
-The processes covers many function such as: get account information in stellar, send lumens/other currencies to another account and 
+The processes cover many function such as: get account information in stellar, send lumens/other currencies to another account and 
 see history of transaction
 
 #### This Prototype using React-Native
