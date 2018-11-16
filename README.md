@@ -58,18 +58,18 @@ wallet
 │   ├── AppNavigator.js
 │   └── MainTabNavigator.js
 └── screens
-│   ├── AccountScreen.js
-│   ├── AuthLoadingScreen.js
-│   ├── DetailTransactionScreen.js
-│   ├── HistoryScreen.js
-│   ├── HomeScreen.js
-│   ├── Index.js
-│   ├── ScanBarcodeScreen.js
-│   ├── SettingsScreen.js
-│   ├── SignInScreen.js
-│   ├── SignUpScreen.js
-│   ├── style.js
-│   └── TransactionScreen.js
+    ├── AccountScreen.js
+    ├── AuthLoadingScreen.js
+    ├── DetailTransactionScreen.js
+    ├── HistoryScreen.js
+    ├── HomeScreen.js
+    ├── Index.js
+    ├── ScanBarcodeScreen.js
+    ├── SettingsScreen.js
+    ├── SignInScreen.js
+    ├── SignUpScreen.js
+    ├── style.js
+    └── TransactionScreen.js
 
 ```
 
