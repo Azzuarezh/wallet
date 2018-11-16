@@ -12,15 +12,15 @@ called [Expo](https://expo.io) and make sure development server (expo server) ru
 
 
 # Prerequisites
-- Node and NPM
-- React-Native
-- Expo client on the device (for development)
+- [Node and NPM](https://nodejs.org/)
+- [React-Native](https://facebook.github.io/react-native/)
+- Expo client on the device for development ([Ios](https://itunes.apple.com/us/app/expo-client/id982107779?mt=8)/[Android](https://play.google.com/store/apps/details?id=host.exp.exponent&hl=en))
 
 # Dependencies
-- React-Native Camera
-- React-Native QR-Code
-- React_native QR-Code Scanner
-- Native Base
+- [React-Native Camera](https://github.com/react-native-community/react-native-camera)
+- [React-Native QR-Code](https://www.npmjs.com/package/react-native-qrcode)
+- [React-Native QR-Code Scanner](https://www.npmjs.com/package/react-native-qrcode-scanner)
+- [Native Base](https://nativebase.io/)
 
 # Folder Structures
 
