@@ -77,7 +77,7 @@ wallet
 # Getting Started
 
 First step is make sure you have installed prerequisites. Then download the project and install its dependencies, you can clone this project via git or directly download. 
-After clone or download successfully, install the dependencies. In the project directory, type  the following command :
+After clone or download successfully, install the dependencies. In the project directory, type  the following command:
 
 ```sh
 # you can choose either npm install or yarn install. I prefer npm instead
@@ -86,7 +86,7 @@ $ npm install
 
 ## Run Application
 In order to run the app with development mode, you need to run the development server (Expo Server) 
-When dependencies installation done, execute the expo command to run the develoment server :
+When dependencies installation done, execute the expo command to run the development server:
 ```sh
 $ expo start
 ```
