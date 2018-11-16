@@ -12,9 +12,9 @@ called [Expo](https://expo.io) and make sure development server running (expo se
 
 # Getting Started
 ## prerequisites
- -Node and NPM
- -React-Native
- -Expo
+-Node and NPM
+-React-Native
+-Expo
 
 
 ## Build App the app (Android)
