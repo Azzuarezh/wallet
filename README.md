@@ -14,5 +14,6 @@ called [Expo](https://expo.io) and make sure development server running (expo se
 For detail how to build Standalone mobile apps, you can refer to this [link](https://docs.expo.io/versions/latest/guides/building-standalone-apps.html).
 but if you want to know how to build the app, you can use the following code snippet:
 ```sh
+# make sure you run the development server and open another terminal
 $ expo build:android
 ```
